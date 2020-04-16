@@ -1,13 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
-    <h1>Youdjas</h1>
-    <audio controls autoplay>
-      <source src="https://p.scdn.co/mp3-preview/dd64cca26c69e93ea78f1fff2cc4889396bb6d2f">
-    </audio>
-=======
   <div class="home" >
     <b-form @submit.prevent="startGame">
       <b-form-input
@@ -26,7 +17,6 @@
         variant="outline-primary"
       >Play!</b-button>
     </b-form>
->>>>>>> ed29b85116c453d66f614b3c5bcf977b800831f0
   </div>
 </template>
 

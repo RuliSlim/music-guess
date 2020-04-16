@@ -1,18 +1,9 @@
-<<<<<<< HEAD
 const io = require('./app');
-const SongController = require('./controller/song.js');
-
-io.on('connection', (socket) => {
-  console.log('User connect')
-  console.log(socket)
-})
-=======
-const http = require("./app.js")
-const io = require("socket.io")(http)
-
+const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
 
 io.on("connection", function(socket){
+  console.log('User connected')
 
   socket.on('create-room', function(roomData){
     RoomController.create(roomData, function(err, createdRoom){
@@ -37,4 +28,3 @@ io.on("connection", function(socket){
   })
 
 })
->>>>>>> ed29b85116c453d66f614b3c5bcf977b800831f0

@@ -1,30 +1,17 @@
 {
   "development": {
-<<<<<<< HEAD
-    "username": "root",
-    "password": null,
-    "database": "database_development",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "operatorsAliases": false
-=======
-    "username": "postgres",
-    "password": "postgres",
+    "username": "admin",
+    "password": "delapan8",
     "database": "tebaklagu",
     "host": "127.0.0.1",
     "dialect": "postgres"
->>>>>>> ed29b85116c453d66f614b3c5bcf977b800831f0
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-<<<<<<< HEAD
     "dialect": "postgres",
-=======
-    "dialect": "mysql",
->>>>>>> ed29b85116c453d66f614b3c5bcf977b800831f0
     "operatorsAliases": false
   },
   "production": {
@@ -32,11 +19,7 @@
     "password": null,
     "database": "database_production",
     "host": "127.0.0.1",
-<<<<<<< HEAD
     "dialect": "postgres",
-=======
-    "dialect": "mysql",
->>>>>>> ed29b85116c453d66f614b3c5bcf977b800831f0
     "operatorsAliases": false
   }
 }
