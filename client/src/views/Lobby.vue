@@ -1,7 +1,7 @@
 <template>
   <div class="lobby py-4">
     <b-form action>
-      <h1 style="color: #df0054; font-weight:bold">Hi, {{myName}}</h1>
+      <h1 style="color: green; font-weight:bold">Hi, {{myName}}</h1>
       <b-row class="my-1 justify-content-center">
         <input
           style="width: 300px;"
@@ -57,7 +57,7 @@ export default {
   created() {
 
     if(this.socket === null){    
-      let socket = io("http://localhost:3000")
+      let socket = io.connect("http://localhost:3000")
       this.$store.commit('setSocket',socket)
     }
     this.$store.commit('resetState')
@@ -91,7 +91,7 @@ export default {
         this.$store.commit("setRoom", room.name) 
         this.$store.commit("setOtherPlayers", room.players)
         this.$store.commit("setMyScore", 0)
-        // this.$router.push('/play') 
+        this.$router.push('/play') 
       })
 
       this.socket.on('update-client-room', ()=>{
@@ -121,8 +121,5 @@ export default {
   font-size: 40px;
 }
 
-h3 {
-  font-size: 40px;
-  color: #df0054;
-}
+
 </style>

@@ -41,7 +41,7 @@ export default {
     startGame() {
        this.setMyName(this.playerName)
        if(this.socket === null){
-         let socket = io("http://localhost:3000")
+         let socket = io.connect("http://localhost:3000")
          this.setSocket(socket)
        }
        localStorage.setItem("playerName", this.playerName)
