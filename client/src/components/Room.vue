@@ -31,7 +31,7 @@ export default {
         name : this.room.name,
         id : this.room.id
       }
-      console.log(payload)
+      // console.log(payload)
       this.socket.emit('join-room', payload)  
       this.$store.commit('setRoom', this.room.name)
       this.$router.push('/play')
