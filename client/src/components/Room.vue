@@ -26,13 +26,13 @@ export default {
     }
   },
   methods : {
-    // joinRoom(name) {
-    //   let payload = {
-    //     playerName : this.myName,
-    //     roomName : this.room.name
-    //   }
-    //   this.socket.emit('join-room', payload)  
-    // },
+    joinRoom(name) {
+      let payload = {
+        playerName : this.myName,
+        roomName : this.room.name
+      }
+      this.socket.emit('join-room', payload)  
+    },
   }
 }
 </script>

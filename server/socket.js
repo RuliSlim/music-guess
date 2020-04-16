@@ -27,4 +27,19 @@ io.on("connection", function(socket){
     })
   })
 
+  socket.on("join-room", function(payload){
+    console.log(payload,`sampai nihhhhh`)
+    RoomController.join(payload, function(err, result){
+      if (err){
+        socket.emit('show-error', 'Failed to join '+ payload.roomName )
+      } else  {
+        socket.join(payload.roomName) //daftarin player ke room yang dia mau join
+        io.to(payload.roomName).emit('player-joined', result.players) // kabarin ke anggota room lain kalo ada yang join
+        socket.emit('get-in-to-room', result) //nyuruh yang join untuk masuk ke room
+        io.emit('update-client-room') //trigger semua client agar update rooms nya
+      }
+       
+    })
+  })
+
 })
