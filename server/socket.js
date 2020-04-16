@@ -1,6 +1,7 @@
 const io = require('./app');
 const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
+let nameSpace;
 
 io.on("connection", function(socket){
   console.log('User connected')
@@ -26,6 +27,31 @@ io.on("connection", function(socket){
       }
     })
   })
+
+  socket.on('join-room', (room) => {
+    // console.log(room, 'ROOM IKI CUUK')
+    let id = room.id;
+    let player = room.playerName;
+    let roomName = room.name;
+
+    RoomController.findOne(id, (err, room) => {
+      if(err) {
+        socket.emit('show-error', 'Room doesnt exists')
+      } else {
+        // socket.on('username', (nickname) => {
+        //   socket.nickname = nickname
+        //   users.push(socket.nickname)
+        // })
+        // socket.nickname = player
+        socket.join(roomName);
+        console.log(socket, 'INI SOCKET NIH SETELAH JOIN ROOM CUY')
+        io.to(roomName).clients((err, client) => {
+          let data = client
+          io.to(roomName).emit('joined-room', data);
+        })
+      }
+    })
+  })
 })
 
 const insideRoom = io.of('/play');
@@ -42,3 +68,25 @@ insideRoom.on('connection', (socket) => {
     })
   })
 })
+
+function getAllRoomMembers(room, _nsp) {
+  var roomMembers = [];
+  var nsp = (typeof _nsp !== 'string') ? '/' : _nsp;
+
+  for( var member in io.nsps[nsp].adapter.rooms[room] ) {
+      roomMembers.push(member);
+  }
+
+  return roomMembers;
+}
+
+// SongController.getOne((err, song) => {
+//   if (err) {
+//     let allData = {
+//       player: player,
+//       room: roomName,
+//       song: song
+//     }
+//     io.to(roomName).emit('joined-room')
+//   }
+// })

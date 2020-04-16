@@ -31,7 +31,12 @@ class RoomController {
     .catch(err => {
       callback(err)
     })
-    
+  }
+
+  static findOne(id, callback) {
+    Room.findOne({where: {id}})
+      .then(room => callback(null, room))
+      .catch(err => callback(err, null));
   }
 
   static delete(roomName, callback){

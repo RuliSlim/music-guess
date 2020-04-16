@@ -19,20 +19,23 @@ import {mapState} from 'vuex'
 export default {
   props : ["room"],
   computed : {
-    ...mapState(["socket", "myName"]),
+    ...mapState(["socket", "myName", "joinedRoom"]),
     players(){
-   
       return Object.keys(this.room.players).map(key => key.split("-")[1])     
     }
   },
   methods : {
-    // joinRoom(name) {
-    //   let payload = {
-    //     playerName : this.myName,
-    //     roomName : this.room.name
-    //   }
-    //   this.socket.emit('join-room', payload)  
-    // },
+    joinRoom(name) {
+      let payload = {
+        playerName : this.myName,
+        name : this.room.name,
+        id : this.room.id
+      }
+      console.log(payload)
+      this.socket.emit('join-room', payload)  
+      this.$store.commit('setRoom', this.room.name)
+      this.$router.push('/play')
+    },
   }
 }
 </script>

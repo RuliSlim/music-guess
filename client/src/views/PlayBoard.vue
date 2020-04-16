@@ -6,7 +6,6 @@
           style="background-color: white; width:100%; height: 100%"
         >{{myName}} : {{score}}</b-container>
       </b-col>
-
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
@@ -67,7 +66,7 @@ export default {
       answer: null,
       answerList: [],
       quenum: 1,
-      score: 0
+      score: 0,
     };
   },
   computed: {
@@ -76,19 +75,15 @@ export default {
       return `Question ${this.quenum}`;
     }
   },
-  created() {
-    if (this.socket === null) {
-      let socket = io.connect("http://localhost:3000");
-      this.$store.commit("setSocket", socket);
-    }
-    this.$store.commit("resetState");
-    this.listenOnSocketEvent();
-  },
   mounted() {
-    console.log(socket)
-    let socket = io.connect("http://localhost:3000/play")
-    this.setSocket(socket)
-    console.log(socket)
+    this.socket.on("joined-room", (data) => {
+      console.log(data, 'ini data')
+      console.log(data.nickname, 'nickname cuy')
+      // this.$store.commit("setPlayerList", data)
+    })
+    // let socket = io.connect("http://localhost:3000/play")
+    // this.setSocket(socket)
+    // console.log(socket)
   },
   methods: {
     ...mapMutations(['setSocket']),
