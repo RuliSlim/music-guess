@@ -26,5 +26,19 @@ io.on("connection", function(socket){
       }
     })
   })
+})
 
+const insideRoom = io.of('/play');
+insideRoom.on('connection', (socket) => {
+  console.log('YOU ARE IN THE PLAYROOM')
+
+  socket.on('play', () => {
+    SongController.getOne((err, data) => {
+      if(err) {
+        socket.emit('show-error', 'Something went wrong!');
+      } else {
+        socket.emit('play', data);
+      }
+    })
+  })
 })

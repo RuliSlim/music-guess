@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 class SongController {
-  static getOne(req, res, next) {
+  static getOne(callback) {
     let idSong ;
     let totalSong;
     let song;
@@ -21,10 +21,11 @@ class SongController {
         idSong = Math.ceil(Math.random() * totalSong);
         data.title = song[idSong].title;
         data.preview = song[idSong].preview;
-        res.status(200).json(data);
+        // res.status(200).json(data);
+        callback(null, data);
       })
       .catch((error)=>{
-        console.log(error);
+        callback(error, null);
       })
   }
 }
