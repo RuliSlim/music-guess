@@ -38,16 +38,10 @@ io.on("connection", function(socket){
       if(err) {
         socket.emit('show-error', 'Room doesnt exists')
       } else {
-        // socket.on('username', (nickname) => {
-        //   socket.nickname = nickname
-        //   users.push(socket.nickname)
-        // })
-        // socket.nickname = player
         socket.join(roomName);
-        console.log(socket, 'INI SOCKET NIH SETELAH JOIN ROOM CUY')
         io.to(roomName).clients((err, client) => {
-          let data = client
-          io.to(roomName).emit('joined-room', data);
+          socket.emit('selfJoin', client[client.length-1]);
+          io.to(roomName).emit('joined-room', client);
         })
       }
     })
@@ -69,16 +63,16 @@ insideRoom.on('connection', (socket) => {
   })
 })
 
-function getAllRoomMembers(room, _nsp) {
-  var roomMembers = [];
-  var nsp = (typeof _nsp !== 'string') ? '/' : _nsp;
+// function getAllRoomMembers(room, _nsp) {
+//   var roomMembers = [];
+//   var nsp = (typeof _nsp !== 'string') ? '/' : _nsp;
 
-  for( var member in io.nsps[nsp].adapter.rooms[room] ) {
-      roomMembers.push(member);
-  }
+//   for( var member in io.nsps[nsp].adapter.rooms[room] ) {
+//       roomMembers.push(member);
+//   }
 
-  return roomMembers;
-}
+//   return roomMembers;
+// }
 
 // SongController.getOne((err, song) => {
 //   if (err) {

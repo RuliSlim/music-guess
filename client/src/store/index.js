@@ -12,7 +12,7 @@ export default new Vuex.Store({
     myName : "",
     myScore:"",
     otherPlayers:{},
-    listPlayer: []
+    listOtherPlayers: [],
   },
   mutations: {
     resetState(state, payload){
@@ -48,7 +48,9 @@ export default new Vuex.Store({
       state.socket = payload
     },
     setPlayerList(state, payload){
-      state.listPlayer.push(payload)
+      delete payload[state.myKey]
+      state.listOtherPlayers = payload
+      // state.listOtherPlayers.push(payload)
     }
   },
   actions: {

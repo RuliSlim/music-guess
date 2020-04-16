@@ -78,12 +78,19 @@ export default {
   mounted() {
     this.socket.on("joined-room", (data) => {
       console.log(data, 'ini data')
-      console.log(data.nickname, 'nickname cuy')
-      // this.$store.commit("setPlayerList", data)
+      // console.log(data.nickname, 'nickname cuy')
+      // this.$store.commit("setMyKey", data[data.length-1]);
+      this.$store.commit("setPlayerList", data)
     })
     // let socket = io.connect("http://localhost:3000/play")
     // this.setSocket(socket)
     // console.log(socket)
+    this.socket.on('selfJoin', (data) => {
+    console.log(data, 'dayada csanjdja')
+      this.$store.commit("setMyKey", data);
+    })
+  },
+  created() {
   },
   methods: {
     ...mapMutations(['setSocket']),
