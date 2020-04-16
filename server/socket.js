@@ -1,9 +1,9 @@
-const http = require("./app.js")
-const io = require("socket.io")(http)
-
+const io = require('./app');
+const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
 
 io.on("connection", function(socket){
+  console.log('User connected')
 
   socket.on('create-room', function(roomData){
     RoomController.create(roomData, function(err, createdRoom){

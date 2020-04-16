@@ -2,7 +2,6 @@ const { Room } = require("../models")
 
 class RoomController {
   static create(roomData, callback){
-
     let newRoom = {
       name : roomData.name,
       players : {
@@ -18,7 +17,6 @@ class RoomController {
       console.log(err)
       callback(err)
     })
-
   }
 
   static findAll(callback){
