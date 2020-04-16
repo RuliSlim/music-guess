@@ -1,4 +1,3 @@
-const { Song } = require('../models');
 const axios = require('axios');
 
 class SongController {
