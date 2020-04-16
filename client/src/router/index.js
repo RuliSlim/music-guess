@@ -2,7 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Lobby from "../views/Lobby.vue";
-import PlayBoard from "../views/Lobby.vue";
+import PlayBoard from "../views/PlayBoard.vue";
 
 
 Vue.use(VueRouter);
@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/play',
     name: 'playBoard',
-    component : PlayBoard
+    component: PlayBoard
   }
 ];
 
