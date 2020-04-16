@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/play',
     name: 'playBoard',
-    component : PlayBoard
+    component: PlayBoard
   }
 ];
 
