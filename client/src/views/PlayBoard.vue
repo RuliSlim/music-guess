@@ -6,7 +6,7 @@
           style="background-color: white; width:100%; height: 100%"
         >{{myName}} : {{score}}</b-container>
       </b-col>
-
+      <button @click="getSong">PLAY SONG</button>
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
@@ -42,34 +42,10 @@
         </b-row>
       </b-col>
     </b-row>
-
-    <!-- <b-form action>
-      <h1 style="color: green; font-weight:bold">Hi, {{myName}}</h1>
-      <b-row class="my-1 justify-content-center">
-        <input
-          style="width: 300px;"
-          id="input-small"
-          size="lg"
-          placeholder="Room Name"
-          v-model="roomName"
-          type="text"
-          maxlength="12"
-          minlength="4"
-          autocomplete="off"
-        />
-        <b-button
-          type="submit"
-          @click.prevent="createRoom"
-          :disabled="roomName.length < 4"
-        >create room</b-button>
-      </b-row>
-    </b-form>-->
   </div>
 </template>
 
-
 <script>
-//github ruli cacat
 // @ is an alias to /src
 //import db from "@/fb";
 import io from "socket.io-client";
@@ -91,25 +67,44 @@ export default {
       answer: null,
       answerList: [],
       quenum: 1,
-      score: 0
+      score: 0,
     };
   },
   computed: {
     ...mapState(["socket", "myName"]),
     questionNumber() {
       return `Question ${this.quenum}`;
+    },
+    otherPlayers() {
+      return this.$store.state.listOtherPlayers
     }
+  },
+  // watch: {
+  //   otherPlayers() {
+  //     if(this.$store.state.listOtherPlayers.length >= 2) {
+  //       console.log('masuk sini sih')
+  //       this.getSong()
+  //     }
+  //   }
+  // },
+  mounted() {
+
+    // if(this.$store.state.otherPlayers.length >= 2) {
+    // }
+    // this.getSong()
+          this.socket.emit("getSong", this.$store.state.joinedRoom);
+      console.log('masuk cuy')
+    this.socket.on('getSong', (data) => {
+      console.log(data, 'Lagu cuy')
+      let audio = new Audio(data.preview);
+      if(!audio.paused) audio.play();
+    })
   },
   created() {
-    if (this.socket === null) {
-      let socket = io.connect("http://localhost:3000");
-      this.$store.commit("setSocket", socket);
-    }
-    this.$store.commit("resetState");
-    this.listenOnSocketEvent();
-    // this.listRoom();
   },
   methods: {
+    ...mapMutations(['setSocket']),
+
     guess(evt) {
       evt.preventDefault();
       if (this.answer == "is lit") {
@@ -134,37 +129,9 @@ export default {
       var container = this.$el.querySelector("#answercontainer");
       container.scrollTop = container.scrollHeight;
     },
-    // listRoom() {
-    //   this.socket.emit("get-rooms");
-    // },
-    // createRoom() {
-    //   let payload = {
-    //     name: this.roomName,
-    //     creator: this.myName
-    //   };
-    //   this.socket.emit("create-room", payload);
-    // },
-    listenOnSocketEvent() {
-      this.socket.on("get-rooms", rooms => {
-        this.roomList = rooms;
-      });
-
-      this.socket.on("room-created", room => {
-        this.roomList.push(room);
-      });
-
-      this.socket.on("get-in-to-room", room => {
-        room.isCreator && this.$store.commit("setIsCreator", true);
-        this.$store.commit("setMyKey", room.playerKey);
-        this.$store.commit("setRoom", room.name);
-        this.$store.commit("setOtherPlayers", room.players);
-        this.$store.commit("setMyScore", 0);
-        this.$router.push("/play");
-      });
-
-      this.socket.on("update-client-room", () => {
-        this.socket.emit("get-rooms");
-      });
+    getSong() {
+      this.socket.emit("getSong", this.$store.state.joinedRoom);
+      console.log('masuk cuy')
     }
   }
 };

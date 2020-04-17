@@ -1,6 +1,7 @@
 const io = require('./app');
 const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
+let nameSpace;
 
 io.on("connection", function(socket){
   console.log('User connected')
@@ -27,19 +28,37 @@ io.on("connection", function(socket){
     })
   })
 
-  socket.on("join-room", function(payload){
-    console.log(payload,`sampai nihhhhh`)
-    RoomController.join(payload, function(err, result){
-      if (err){
-        socket.emit('show-error', 'Failed to join '+ payload.roomName )
-      } else  {
-        socket.join(payload.roomName) //daftarin player ke room yang dia mau join
-        io.to(payload.roomName).emit('player-joined', result.players) // kabarin ke anggota room lain kalo ada yang join
-        socket.emit('get-in-to-room', result) //nyuruh yang join untuk masuk ke room
-        io.emit('update-client-room') //trigger semua client agar update rooms nya
+  socket.on('join-room', (room) => {
+    let id = room.id;
+    let player = room.playerName;
+    let roomName = room.name;
+
+    RoomController.findOne(id, (err, room) => {
+      if(err) {
+        socket.emit('show-error', 'Room doesnt exists')
+      } else {
+        io.to(roomName).clients((err, client) => {
+          if(client.length == 2) {
+            socket.emit('failJoin', 'Room fuul')
+          } else {
+            socket.join(roomName);
+            socket.emit('selfJoin', client[client.length-1]);
+            io.to(roomName).emit('joined-room', client);
+          }
+        })
       }
-       
     })
   })
 
+  // let hasSend = false;
+  socket.on('getSong', (roomName) => {
+    // if(io.to)
+    io.to(roomName).clients((err, client) => {
+        if(client.length > 1) {
+          SongController.getOne((err, song) => {
+            io.to(roomName).emit('getSong', song)
+          })
+        }
+    })
+  })
 })

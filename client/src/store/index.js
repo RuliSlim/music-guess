@@ -6,24 +6,24 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     socket : null,
-    room:"",
+    joinedRoom:"",
     isCreator : false,
     myKey : "",
     myName : "",
     myScore:"",
-    otherPlayers:{}
+    otherPlayers:{},
+    listOtherPlayers: [],
   },
   mutations: {
     resetState(state, payload){
-      state.room = "",
+      state.joinedRoom = "",
       state.isCreator  =  false,
       state.myKey  =  "",
       state.myScore = 0,
       state.otherPlayers = {}
-
     },
     setRoom(state,payload){
-      state.room = payload
+      state.joinedRoom = payload
     },
     setIsCreator(state,payload){
       state.isCreator = payload
@@ -46,6 +46,11 @@ export default new Vuex.Store({
     },
     setSocket(state, payload){
       state.socket = payload
+    },
+    setPlayerList(state, payload){
+      delete payload[state.myKey]
+      state.listOtherPlayers = payload
+      // state.listOtherPlayers.push(payload)
     }
   },
   actions: {
