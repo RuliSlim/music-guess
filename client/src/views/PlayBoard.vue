@@ -14,27 +14,34 @@
           <h5 v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
         </div>
       </b-col>
-      <button @click="getSong">PLAY SONG</button>
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
             header="Guess The Song Title Below"
-            lead="this is lead"
+            lead="The first song will start automatically when the head count has reached 4, afterward click new song after someone guesses correcty or 15 seconds has passed. HAVE FUN... if it works"
             style="width:100%; height: 100%; margin: 0px; border-radius: 0px;"
-          ></b-jumbotron>
+          >
+            <p>
+              please dont click this when music is playing, or spam it. It'll make the developers real sad :(
+              <br />please, we havent sleep yet
+              <br />maybe you can chat and coordinate who clicks the button below
+              <br />Thanks, sincerly yungmamba
+            </p>
+            <button @click="getSong">NEW SONG</button>
+          </b-jumbotron>
         </b-row>
         <b-row style="margin: 0px">
           <div
             id="answercontainer"
             style="background-color: white; width:100%; height: 300px; overflow:scroll; overflow-x:hidden;"
           >
-            <ul>
-              <li v-for="(data,i) in answerList" :key="i" style="list-style-type:none;">
-                <span
+            <ul style="padding: 0px; margin:0px;">
+              <li v-for="(data,i) in answerList" :key="i" style="list-style-type:none; ">
+                <div
                   v-if="data.user == 1"
-                  style="background-color: gray; color: white;"
-                >{{myName}}: {{data.guess}}</span>
-                <span v-else>Anonymous: {{data.guess}}</span>
+                  style="background-color: gray; color: white; padding-left: 20px;"
+                >{{myName}}: {{data.guess}}</div>
+                <div v-else style="padding-left: 20px; ">Anonymous: {{data.guess}}</div>
               </li>
             </ul>
           </div>
@@ -52,10 +59,18 @@
         </b-row>
       </b-col>
     </b-row>
+
+    <b-modal id="winnerModal" :title="title" hide-footer>
+      <p class="my-4">{{winner}} guessed correctly</p>
+    </b-modal>
   </div>
 </template>
 
+
+
+
 <script>
+let audio;
 // @ is an alias to /src
 //import db from "@/fb";
 import io from "socket.io-client";
@@ -74,27 +89,45 @@ export default {
     return {
       roomName: "",
       roomList: [],
-      answer: null,
-      answerList: []
+      answer: "",
+      answerList: [],
+      title: null,
+      winner: null,
+      win: false
     };
   },
   computed: {
-    ...mapState(["socket", "myName", "myKey", "playerCount"])
+    ...mapState(["socket", "myName", "myKey", "playerCount"]),
+    checkGuess() {
+      if (this.answer) {
+      }
+      return this.answer.toLowerCase();
+      //   return "";
+    },
+    checkTitle() {
+      if (this.title) {
+        return this.title.toLowerCase();
+      }
+    }
   },
-  // watch: {
-  //   otherPlayers() {
-  //     if(this.$store.state.listOtherPlayers.length >= 2) {
-  //       console.log('masuk sini sih')
-  //       this.getSong()
-  //     }
-  //   }
-  // },
   mounted() {
-
-    this.socket.on("joined-room", data => {
-      console.log(data, "ini data");
-      this.$store.commit("setPlayerCount", data);
-    });
+    this.socket.on("win", data => {
+      this.winner = data.name;
+      console.log(data, "this.winner");
+      this.win = true;
+      if (this.winner) {
+        this.$bvModal.show("winnerModal");
+        audio.pause();
+        setTimeout(cb => {
+          this.winner = null;
+          this.$bvModal.hide("winnerModal");
+        }, 3000);
+      }
+    }),
+      this.socket.on("joined-room", data => {
+        console.log(data, "ini data");
+        this.$store.commit("setPlayerCount", data);
+      });
     this.socket.on("selfJoin", data => {
       console.log(data, "dayada csanjdja");
       this.$store.commit("setMyKey", data);
@@ -104,25 +137,43 @@ export default {
       this.answerList.push({ guess: data, user: 0 });
     });
 
-          this.socket.emit("getSong", this.$store.state.joinedRoom);
-      console.log('masuk cuy')
-    this.socket.on('getSong', (data) => {
-      console.log(data, 'Lagu cuy')
-      let audio = new Audio(data.preview);
-      if(!audio.paused) audio.play();
-    })
+    this.socket.emit("getSong", this.$store.state.joinedRoom);
+    console.log("masuk cuy");
+    this.socket.on("getSong", data => {
+      console.log(data, "Lagu cuy");
+      audio = new Audio(data.preview);
+      this.title = data.title;
+      audio.play();
+      setTimeout(cb => {
+        if (!this.win) {
+          audio.pause();
+          this.socket.emit("correct", {
+            name: "Nobody",
+            title: this.title,
+            room: this.$store.state.joinedRoom
+          });
+        }
+        console.log("timeeee out");
+      }, 15000);
+    });
   },
-  created() {
-
-  },
+  created() {},
   methods: {
     ...mapMutations(["setSocket"]),
 
     guess(evt) {
       evt.preventDefault();
-      if (this.answer == "is lit") {
-        //next song
+      console.log(this.checkGuess, this.checkTitle);
+
+      if (this.checkGuess == this.checkTitle) {
+        console.log("masuk correc");
+        this.socket.emit("correct", {
+          name: this.myName,
+          title: this.title,
+          room: this.$store.state.joinedRoom
+        });
       }
+
       this.answerList.push({
         user: 1,
         guess: this.answer
@@ -133,18 +184,21 @@ export default {
         room: this.$store.state.joinedRoom
       });
 
-      this.answer = null;
-      //   this.scrollToEnd();
+      this.answer = "";
     },
     scrollToEnd: function() {
       var container = this.$el.querySelector("#answercontainer");
       container.scrollTop = container.scrollHeight;
+    },
+    getSong() {
+      this.socket.emit("getSong", this.$store.state.joinedRoom);
+      this.win = false;
+      console.log("masuk cuy");
     }
   },
   watch: {
     answerList() {
       this.scrollToEnd();
-
     }
   }
 };

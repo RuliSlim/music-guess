@@ -31,7 +31,7 @@ export default new Vuex.Store({
       state.socket = payload
     },
     setPlayerCount(state, payload) {
-      state.playerCount = payload.length
+      state.playerCount = payload.length + 1
     }
   },
   actions: {

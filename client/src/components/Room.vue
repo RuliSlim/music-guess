@@ -1,12 +1,13 @@
 <template>
   <div class="room p-2 m-2" style="min-width:200px; box-shadow: 5px 5px 10px red;">
     <h4>{{room.name}}</h4>
-   
+
     <h5 v-if="players.length >= 4">FULL</h5>
     <div class="w-100" v-if="players.length < 4">
       <p class="text-left" v-for="(player, index) in players" :key="index">{{player}}</p>
     </div>
-    <b-button v-if="players.length < 4"
+    <b-button
+      v-if="players.length < 4"
       size="small"
       type="submit"
       @click.prevent="joinRoom(room.name)"
@@ -15,40 +16,37 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from "vuex";
 export default {
-  props : ["room"],
-  computed : {
+  props: ["room"],
+  computed: {
     ...mapState(["socket", "myName", "joinedRoom"]),
-    players(){
-      return Object.keys(this.room.players).map(key => key.split("-")[1])     
+    players() {
+      return Object.keys(this.room.players).map(key => key.split("-")[1]);
     }
   },
-  methods : {
+  methods: {
     joinRoom(name) {
       let payload = {
-        playerName : this.myName,
-        name : this.room.name,
-        id : this.room.id
-      }
+        playerName: this.myName,
+        name: this.room.name,
+        id: this.room.id
+      };
       // console.log(payload)
-      this.socket.emit('join-room', payload)  
-      this.$store.commit('setRoom', this.room.name)
-      this.socket.on("joined-room", (data) => {
-        this.$store.commit("setPlayerList", data)
-      })
-      this.socket.on('selfJoin', (data) => {
-      // console.log(data, 'dayada csanjdja')
+      this.socket.emit("join-room", payload);
+      this.$store.commit("setRoom", this.room.name);
+      this.socket.on("joined-room", data => {});
+      this.socket.on("selfJoin", data => {
+        // console.log(data, 'dayada csanjdja')
         this.$store.commit("setMyKey", data);
-        this.$router.push('/play')
-      })
-      this.socket.on('failJoin', (data) => {
-        this.$router.push('/')
-      })
-
-    },
+        this.$router.push("/play");
+      });
+      this.socket.on("failJoin", data => {
+        this.$router.push("/");
+      });
+    }
   }
-}
+};
 </script>
 
 <style scoped>
