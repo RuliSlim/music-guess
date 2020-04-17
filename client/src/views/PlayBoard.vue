@@ -14,6 +14,7 @@
           <h5 v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
         </div>
       </b-col>
+      <button @click="getSong">PLAY SONG</button>
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
@@ -78,9 +79,18 @@ export default {
     };
   },
   computed: {
-    ...mapState(["socket", "myName", "myScore", "myKey", "playerCount"])
+    ...mapState(["socket", "myName", "myKey", "playerCount"])
   },
+  // watch: {
+  //   otherPlayers() {
+  //     if(this.$store.state.listOtherPlayers.length >= 2) {
+  //       console.log('masuk sini sih')
+  //       this.getSong()
+  //     }
+  //   }
+  // },
   mounted() {
+
     this.socket.on("joined-room", data => {
       console.log(data, "ini data");
       this.$store.commit("setPlayerCount", data);
@@ -94,7 +104,16 @@ export default {
       this.answerList.push({ guess: data, user: 0 });
     });
 
-    /// get lagu
+          this.socket.emit("getSong", this.$store.state.joinedRoom);
+      console.log('masuk cuy')
+    this.socket.on('getSong', (data) => {
+      console.log(data, 'Lagu cuy')
+      let audio = new Audio(data.preview);
+      if(!audio.paused) audio.play();
+    })
+  },
+  created() {
+
   },
   methods: {
     ...mapMutations(["setSocket"]),
@@ -125,6 +144,7 @@ export default {
   watch: {
     answerList() {
       this.scrollToEnd();
+
     }
   }
 };
