@@ -1,23 +1,24 @@
 <template>
   <div class="lobby py-4">
     <b-row no-gutters style="width: 80%; margin: 0px; padding-top: 100px">
-      <b-col cols="6" md="4">
+      <b-col cols="6" md="4" style="background-color: #9e8fb2;
+background-image: linear-gradient(315deg, #9e8fb2 0%, #a7acd9 74%);">
         <!-- <b-container style="background-color: white; width:100%; height: 100%"> -->
-        <div style="font-size: 50px; background-color: black; height: 300px;">
+        <div style="font-size: 50px; height: 300px;" class="ml-2 text-center">
           Welcome,
           <br />
           {{myName}}
         </div>
-        <div style="background-color: gray; height: auto;">
-          <h2 style="font-size: 38px; height: fit-content;">Head Count</h2>
-          <h1 style="font-size: 72px; height: 100%">{{playerCount}}</h1>
-          <h5 v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
+        <div style="background-color: #EFC9AF; height: auto;">
+          <h2 style="font-size: 38px; height: fit-content;" class="ml-2">Head Count</h2>
+          <h1 style="font-size: 72px; height: 100%" class="ml-2">{{playerCount}}</h1>
+          <h5 class="ml-2 pb-2" v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
         </div>
       </b-col>
       <b-col cols="12" md="8">
-        <b-row style="margin: 0px; height:500px;">
+        <b-row style="margin: 0px; height:505px;">
           <b-jumbotron
-            header="Guess The Song Title Below"
+            header="Guess The Song Title Below ♪"
             lead="The first song will start automatically when the head count has reached 4, afterward click new song after someone guesses correcty or 15 seconds has passed. HAVE FUN... if it works"
             style="width:100%; height: 100%; margin: 0px; border-radius: 0px;"
           >
@@ -27,7 +28,7 @@
               <br />maybe you can chat and coordinate who clicks the button below
               <br />Thanks, sincerly yungmamba
             </p>
-            <button @click="getSong">NEW SONG</button>
+            <b-button variant="warning" @click="getSong">NEW SONG</b-button>
           </b-jumbotron>
         </b-row>
         <b-row style="margin: 0px">
