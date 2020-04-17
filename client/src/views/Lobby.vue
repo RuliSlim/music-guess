@@ -91,7 +91,7 @@ export default {
         this.$store.commit("setRoom", room.name) 
         this.$store.commit("setOtherPlayers", room.players)
         this.$store.commit("setMyScore", 0)
-        this.$router.push('/play') 
+        // this.$router.push('/play') 
       })
 
       this.socket.on('update-client-room', ()=>{
