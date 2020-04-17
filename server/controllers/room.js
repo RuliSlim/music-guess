@@ -74,6 +74,41 @@ class RoomController {
       callback(err)
     })
   }
+
+  static join(payload, callback) {
+
+    let playerKey;
+    Room.findOne({
+            where: {             
+                name: payload.roomName
+            }
+        })
+        .then(result => {
+            if (result) {
+                let idx = Object.keys(result.players).length;
+                playerKey = `${idx + 1}-${payload.playerName}`;
+                result.players[playerKey] = 0;
+                result.changed('players', true);
+
+                return result.save();
+            } else {
+                throw {
+                    status_code: 404,
+                    message: 'Room Not Found'
+                };
+            }
+        })
+        .then(result => {
+            let data_result = result.dataValues
+            callback(null, {
+                ...data_result,
+                playerKey
+            });
+        })
+        .catch(err => {
+            callback(err, null);
+        });
+}
 }
 
 module.exports = RoomController

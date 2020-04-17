@@ -45,6 +45,7 @@ export default {
       this.socket.on('failJoin', (data) => {
         this.$router.push('/')
       })
+
     },
   }
 }
