@@ -2,15 +2,6 @@ const io = require('./app');
 const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
 let nameSpace;
-let allData
-
-let roomOne = {
-  name: 'asd',
-  players: []
-}
-let joinedRoom  = {
-
-}
 
 io.on("connection", function(socket){
   console.log('User connected')
@@ -42,31 +33,15 @@ io.on("connection", function(socket){
     let player = room.playerName;
     let roomName = room.name;
 
-    // {
-    //   namadjasfusaufe: roomName,
-    //   playfsakhfsafgoers: []
-    // }
-
     RoomController.findOne(id, (err, room) => {
       if(err) {
         socket.emit('show-error', 'Room doesnt exists')
       } else {
-        console.log('masukdmksd')
-        // joinedRoom.name = roomName;
-        // if(!joinedRoom.players.length) {
-        //   console.log('huuh')
-        //   joinedRoom.players = [];
-        // }
-        // joinedRoom.players.push(player);
-        // console.log(joinedRoom, 'joinend room')
-        roomOne.name = roomName
-        roomOne.players.push(player);
-        console.log(roomOne)
         socket.join(roomName);
-        // io.to(roomName).clients((err, client) => {
-          // socket.emit('selfJoin', client[client.length-1]);
+        io.to(roomName).clients((err, client) => {
+          socket.emit('selfJoin', client[client.length-1]);
           io.to(roomName).emit('joined-room', client);
-        // })
+        })
       }
     })
   })
@@ -78,7 +53,7 @@ io.on("connection", function(socket){
       // if(!hasSend) {
         if(client.length > 1) {
           // hasSend = true;
-          console.log('sending to client', client)
+          // console.log('sending to client', client)
           SongController.getOne((err, song) => {
             io.to(roomName).emit('getSong', song)
           })
