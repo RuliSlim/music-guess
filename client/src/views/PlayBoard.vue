@@ -18,11 +18,11 @@
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
             header="Guess The Song Title Below"
-            lead="this is lead"
+            lead="The first song will start automatically when the head count has reached 4, afterward click new song after someone guesses correcty or 15 seconds has passed. HAVE FUN... if it works"
             style="width:100%; height: 100%; margin: 0px; border-radius: 0px;"
           >
             <p>
-              please dont click this when music is playing, or spam it. It'll make the developers real sad :(.
+              please dont click this when music is playing, or spam it. It'll make the developers real sad :(
               <br />please, we havent sleep yet
               <br />maybe you can chat and coordinate who clicks the button below
               <br />Thanks, sincerly yungmamba

@@ -39,7 +39,7 @@ io.on("connection", function (socket) {
       } else {
         io.to(roomName).clients((err, client) => {
 
-          if (client.length == 2) { //room capacity
+          if (client.length == 4) { //room capacity
             socket.emit('failJoin', 'Room fuul')
           } else {
             console.log(client, 'socketjs')
@@ -69,7 +69,7 @@ io.on("connection", function (socket) {
   socket.on('getSong', (roomName) => {
     // if(io.to)
     io.to(roomName).clients((err, client) => {
-      if (client.length > 1) { //room capacity -1
+      if (client.length > 3) { //room capacity -1
         SongController.getOne((err, song) => {
           io.to(roomName).emit('getSong', song)
         })
