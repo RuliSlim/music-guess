@@ -1,5 +1,5 @@
 <template>
-  <div class="room p-2 m-2" style="min-width:200px; box-shadow: 5px 5px 10px red;">
+  <div class="room p-2 m-2 rounded" style="min-width:200px; ;">
     <h4>{{room.name}}</h4>
 
     <h5 v-if="players.length >= 4">FULL</h5>
@@ -10,6 +10,7 @@
       v-if="players.length < 4"
       size="small"
       type="submit"
+      variant="info"
       @click.prevent="joinRoom(room.name)"
     >Join</b-button>
   </div>

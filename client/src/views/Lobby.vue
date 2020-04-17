@@ -1,20 +1,21 @@
 <template>
   <div class="lobby py-4">
     <b-form action>
-      <h1 style="color: green; font-weight:bold">Hi, {{myName}}</h1>
-      <b-row class="my-1 justify-content-center">
+      <h1 style="color: white; font-weight:bold">Hi, {{myName}} ♫</h1>
+      <b-row class="mt-3 justify-content-center">
         <input
           style="width: 300px;"
           id="input-small"
           size="lg"
           placeholder="Room Name"
           v-model="roomName"
+          class="rounded"
           type="text"
           maxlength="12"
           minlength="4"
           autocomplete="off"
         >
-        <b-button type="submit" @click.prevent="createRoom" :disabled="roomName.length < 4">create room</b-button>
+        <b-button type="submit" @click.prevent="createRoom" variant="success" :disabled="roomName.length < 4">Create Room</b-button>
       </b-row>
     </b-form>
     <div class="container mt-4 w-100" style="display: flex; flex-wrap: wrap;">

@@ -1,8 +1,9 @@
 <template>
   <div class="home" >
+     <p style="font-size : 60px; color: white">GuessTheMusic</p>
     <b-form @submit.prevent="startGame">
       <b-form-input
-        class="mb-5"
+        class="mb-3"
         id="input-small"
         size="sm"
         placeholder="Enter your name"
@@ -14,7 +15,7 @@
         :disabled="playerName === ''"
         class=""
         @click.prevent="startGame"
-        variant="outline-primary"
+        variant="outline-light"
       >Play!</b-button>
     </b-form>
   </div>
