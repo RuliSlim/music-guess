@@ -2,14 +2,22 @@
   <div class="lobby py-4">
     <b-row no-gutters style="width: 80%; margin: 0px; padding-top: 100px">
       <b-col cols="6" md="4">
-        <b-container
-          style="background-color: white; width:100%; height: 100%"
-        >{{myName}} : {{score}}</b-container>
+        <!-- <b-container style="background-color: white; width:100%; height: 100%"> -->
+        <div style="font-size: 50px; background-color: black; height: 300px;">
+          Welcome,
+          <br />
+          {{myName}}
+        </div>
+        <div style="background-color: gray; height: auto;">
+          <h2 style="font-size: 38px; height: fit-content;">Head Count</h2>
+          <h1 style="font-size: 72px; height: 100%">{{playerCount}}</h1>
+          <h5 v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
+        </div>
       </b-col>
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
-            :header="questionNumber"
+            header="Guess The Song Title Below"
             lead="this is lead"
             style="width:100%; height: 100%; margin: 0px; border-radius: 0px;"
           ></b-jumbotron>
@@ -20,10 +28,12 @@
             style="background-color: white; width:100%; height: 300px; overflow:scroll; overflow-x:hidden;"
           >
             <ul>
-              <li v-for="(data,i) in answerList" :key="i">
+              <li v-for="(data,i) in answerList" :key="i" style="list-style-type:none;">
                 <span
-                  :style="{color: data.type == 1 ? 'red' : 'black'}"
-                >{{data.user}}nameplaceholder:{{data.guess}}</span>
+                  v-if="data.user == 1"
+                  style="background-color: gray; color: white;"
+                >{{myName}}: {{data.guess}}</span>
+                <span v-else>Anonymous: {{data.guess}}</span>
               </li>
             </ul>
           </div>
@@ -64,82 +74,57 @@ export default {
       roomName: "",
       roomList: [],
       answer: null,
-      answerList: [],
-      quenum: 1,
-      score: 0,
+      answerList: []
     };
   },
   computed: {
-    ...mapState(["socket", "myName"]),
-    questionNumber() {
-      return `Question ${this.quenum}`;
-    }
+    ...mapState(["socket", "myName", "myScore", "myKey", "playerCount"])
   },
   mounted() {
-    this.socket.on("joined-room", (data) => {
-      console.log(data, 'ini data')
-      // console.log(data.nickname, 'nickname cuy')
-      // this.$store.commit("setMyKey", data[data.length-1]);
-      this.$store.commit("setPlayerList", data)
-    })
-    // let socket = io.connect("http://localhost:3000/play")
-    // this.setSocket(socket)
-    // console.log(socket)
-    this.socket.on('selfJoin', (data) => {
-    console.log(data, 'dayada csanjdja')
+    this.socket.on("joined-room", data => {
+      console.log(data, "ini data");
+      this.$store.commit("setPlayerCount", data);
+    });
+    this.socket.on("selfJoin", data => {
+      console.log(data, "dayada csanjdja");
       this.$store.commit("setMyKey", data);
-    })
-  },
-  created() {
+    });
+    this.socket.on("otherGuess", data => {
+      console.log(data);
+      this.answerList.push({ guess: data, user: 0 });
+    });
+
+    /// get lagu
   },
   methods: {
-    ...mapMutations(['setSocket']),
+    ...mapMutations(["setSocket"]),
 
     guess(evt) {
       evt.preventDefault();
       if (this.answer == "is lit") {
-        this.answerList.push({
-          user: this.myName,
-          guess: this.answer,
-          type: 1
-        });
-        this.score++;
-        this.quenum++;
-      } else {
-        this.answerList.push({
-          user: this.myName,
-          guess: this.answer,
-          type: 0
-        });
+        //next song
       }
+      this.answerList.push({
+        user: 1,
+        guess: this.answer
+      });
+
+      this.socket.emit("guess", {
+        guess: this.answer,
+        room: this.$store.state.joinedRoom
+      });
+
       this.answer = null;
-      this.scrollToEnd();
+      //   this.scrollToEnd();
     },
     scrollToEnd: function() {
       var container = this.$el.querySelector("#answercontainer");
       container.scrollTop = container.scrollHeight;
-    },
-    listenOnSocketEvent() {
-      this.socket.on("get-rooms", rooms => {
-        this.roomList = rooms;
-      });
-
-      this.socket.on("room-created", room => {
-        this.roomList.push(room);
-      });
-
-      this.socket.on("get-in-to-room", room => {
-        room.isCreator && this.$store.commit("setIsCreator", true);
-        this.$store.commit("setMyKey", room.playerKey);
-        this.$store.commit("setRoom", room.name);
-        this.$store.commit("setOtherPlayers", room.players);
-        this.$store.commit("setMyScore", 0);
-        this.$router.push("/play");
-      });
-
-      this.socket.on("update-client-room", () => {
-        this.socket.emit("get-rooms");
-      });
+    }
+  },
+  watch: {
+    answerList() {
+      this.scrollToEnd();
     }
   }
 };

@@ -3,24 +3,24 @@ const SongController = require('./controllers/song.js');
 const RoomController = require("./controllers/room")
 let nameSpace;
 
-io.on("connection", function(socket){
+io.on("connection", function (socket) {
   console.log('User connected')
 
-  socket.on('create-room', function(roomData){
-    RoomController.create(roomData, function(err, createdRoom){
-      if(err) {
+  socket.on('create-room', function (roomData) {
+    RoomController.create(roomData, function (err, createdRoom) {
+      if (err) {
         socket.emit('show-error', 'Failed to create room')
       } else {
-        io.emit('room-created', createdRoom) 
-        socket.join(createdRoom.name) 
-        socket.emit('get-in-to-room', {...createdRoom, playerKey: `1-${roomData.creator}`, isCreator : true}) 
+        io.emit('room-created', createdRoom)
+        socket.join(createdRoom.name)
+        socket.emit('get-in-to-room', { ...createdRoom, playerKey: `1-${roomData.creator}`, isCreator: true })
       }
     })
   })
 
-  socket.on('get-rooms', function(){
-    RoomController.findAll(function(err, results){
-      if(err){
+  socket.on('get-rooms', function () {
+    RoomController.findAll(function (err, results) {
+      if (err) {
         socket.emit('show-error', "Failed to get room data")
       } else {
         socket.emit("get-rooms", results)
@@ -35,18 +35,30 @@ io.on("connection", function(socket){
     let roomName = room.name;
 
     RoomController.findOne(id, (err, room) => {
-      if(err) {
+      if (err) {
         socket.emit('show-error', 'Room doesnt exists')
       } else {
         socket.join(roomName);
         io.to(roomName).clients((err, client) => {
-          socket.emit('selfJoin', client[client.length-1]);
+          socket.emit('selfJoin', client[client.length - 1]);
           io.to(roomName).emit('joined-room', client);
         })
       }
     })
   })
+
+  socket.on('guess', (answer) => {
+    socket.broadcast.to(answer.room).emit('otherGuess', answer.guess);
+    // io.to(answer.room).emit('otherGuess', answer.guess)
+  })
+
+  // socket.on('updateScore', (data) => {
+  //   io.to(data.room).emit('otherScores', answer.guess)
+  // })
+
+
 })
+
 
 const insideRoom = io.of('/play');
 insideRoom.on('connection', (socket) => {
@@ -54,7 +66,7 @@ insideRoom.on('connection', (socket) => {
 
   socket.on('play', () => {
     SongController.getOne((err, data) => {
-      if(err) {
+      if (err) {
         socket.emit('show-error', 'Something went wrong!');
       } else {
         socket.emit('play', data);
