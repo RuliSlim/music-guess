@@ -59,6 +59,7 @@ io.on("connection", function (socket) {
 
 
   socket.on('correct', (winner) => {
+    console.log(winner)
     io.to(winner.room).emit('win', { name: winner.name, title: winner.title })
   })
 

@@ -14,27 +14,34 @@
           <h5 v-if="playerCount<4">Waiting for {{4-playerCount}} more players to join before playing</h5>
         </div>
       </b-col>
-      <button @click="getSong">PLAY SONG</button>
       <b-col cols="12" md="8">
         <b-row style="margin: 0px; height:500px;">
           <b-jumbotron
             header="Guess The Song Title Below"
             lead="this is lead"
             style="width:100%; height: 100%; margin: 0px; border-radius: 0px;"
-          ></b-jumbotron>
+          >
+            <p>
+              please dont click this when music is playing, or spam it. It'll make the developers real sad :(.
+              <br />please, we havent sleep yet
+              <br />maybe you can chat and coordinate who clicks the button below
+              <br />Thanks, sincerly yungmamba
+            </p>
+            <button @click="getSong">NEW SONG</button>
+          </b-jumbotron>
         </b-row>
         <b-row style="margin: 0px">
           <div
             id="answercontainer"
             style="background-color: white; width:100%; height: 300px; overflow:scroll; overflow-x:hidden;"
           >
-            <ul>
-              <li v-for="(data,i) in answerList" :key="i" style="list-style-type:none;">
-                <span
+            <ul style="padding: 0px; margin:0px;">
+              <li v-for="(data,i) in answerList" :key="i" style="list-style-type:none; ">
+                <div
                   v-if="data.user == 1"
-                  style="background-color: gray; color: white;"
-                >{{myName}}: {{data.guess}}</span>
-                <span v-else>Anonymous: {{data.guess}}</span>
+                  style="background-color: gray; color: white; padding-left: 20px;"
+                >{{myName}}: {{data.guess}}</div>
+                <div v-else style="padding-left: 20px; ">Anonymous: {{data.guess}}</div>
               </li>
             </ul>
           </div>
@@ -52,9 +59,8 @@
         </b-row>
       </b-col>
     </b-row>
-    <b-button v-b-modal.modal-1>Launch demo modal</b-button>
 
-    <b-modal id="winnerModal" :title="title">
+    <b-modal id="winnerModal" :title="title" hide-footer>
       <p class="my-4">{{winner}} guessed correctly</p>
     </b-modal>
   </div>
@@ -83,34 +89,39 @@ export default {
     return {
       roomName: "",
       roomList: [],
-      answer: null,
+      answer: "",
       answerList: [],
-      audioUrl: null,
       title: null,
-      winner: null
+      winner: null,
+      win: false
     };
   },
   computed: {
     ...mapState(["socket", "myName", "myKey", "playerCount"]),
     checkGuess() {
+      if (this.answer) {
+      }
       return this.answer.toLowerCase();
+      //   return "";
     },
     checkTitle() {
-      return this.title.toLowerCase();
+      if (this.title) {
+        return this.title.toLowerCase();
+      }
     }
   },
   mounted() {
     this.socket.on("win", data => {
       this.winner = data.name;
       console.log(data, "this.winner");
+      this.win = true;
       if (this.winner) {
         this.$bvModal.show("winnerModal");
-        //audio = new Audio(this.audioUrl);
-        // audio.stop();
         audio.pause();
-        // sound.currentTime = 0;
-        // this.audio.stop();
-        this.winner = null;
+        setTimeout(cb => {
+          this.winner = null;
+          this.$bvModal.hide("winnerModal");
+        }, 3000);
       }
     }),
       this.socket.on("joined-room", data => {
@@ -130,10 +141,20 @@ export default {
     console.log("masuk cuy");
     this.socket.on("getSong", data => {
       console.log(data, "Lagu cuy");
-      this.audioUrl = data.preview;
       audio = new Audio(data.preview);
       this.title = data.title;
       audio.play();
+      setTimeout(cb => {
+        if (!this.win) {
+          audio.pause();
+          this.socket.emit("correct", {
+            name: "Nobody",
+            title: this.title,
+            room: this.$store.state.joinedRoom
+          });
+        }
+        console.log("timeeee out");
+      }, 15000);
     });
   },
   created() {},
@@ -163,7 +184,7 @@ export default {
         room: this.$store.state.joinedRoom
       });
 
-      this.answer = null;
+      this.answer = "";
     },
     scrollToEnd: function() {
       var container = this.$el.querySelector("#answercontainer");
@@ -171,6 +192,7 @@ export default {
     },
     getSong() {
       this.socket.emit("getSong", this.$store.state.joinedRoom);
+      this.win = false;
       console.log("masuk cuy");
     }
   },
