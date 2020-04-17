@@ -37,10 +37,14 @@ io.on("connection", function(socket){
       if(err) {
         socket.emit('show-error', 'Room doesnt exists')
       } else {
-        socket.join(roomName);
         io.to(roomName).clients((err, client) => {
-          socket.emit('selfJoin', client[client.length-1]);
-          io.to(roomName).emit('joined-room', client);
+          if(client.length == 2) {
+            socket.emit('failJoin', 'Room fuul')
+          } else {
+            socket.join(roomName);
+            socket.emit('selfJoin', client[client.length-1]);
+            io.to(roomName).emit('joined-room', client);
+          }
         })
       }
     })
@@ -50,52 +54,11 @@ io.on("connection", function(socket){
   socket.on('getSong', (roomName) => {
     // if(io.to)
     io.to(roomName).clients((err, client) => {
-      // if(!hasSend) {
         if(client.length > 1) {
-          // hasSend = true;
-          // console.log('sending to client', client)
           SongController.getOne((err, song) => {
             io.to(roomName).emit('getSong', song)
           })
         }
-      // }
     })
   })
 })
-
-const insideRoom = io.of('/play');
-insideRoom.on('connection', (socket) => {
-  console.log('YOU ARE IN THE PLAYROOM')
-
-  socket.on('play', () => {
-    SongController.getOne((err, data) => {
-      if(err) {
-        socket.emit('show-error', 'Something went wrong!');
-      } else {
-        socket.emit('play', data);
-      }
-    })
-  })
-})
-
-// function getAllRoomMembers(room, _nsp) {
-//   var roomMembers = [];
-//   var nsp = (typeof _nsp !== 'string') ? '/' : _nsp;
-
-//   for( var member in io.nsps[nsp].adapter.rooms[room] ) {
-//       roomMembers.push(member);
-//   }
-
-//   return roomMembers;
-// }
-
-// SongController.getOne((err, song) => {
-//   if (err) {
-//     let allData = {
-//       player: player,
-//       room: roomName,
-//       song: song
-//     }
-//     io.to(roomName).emit('joined-room')
-//   }
-// })

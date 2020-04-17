@@ -88,13 +88,7 @@ export default {
   //   }
   // },
   mounted() {
-    this.socket.on("joined-room", (data) => {
-      this.$store.commit("setPlayerList", data)
-    })
-    this.socket.on('selfJoin', (data) => {
-    // console.log(data, 'dayada csanjdja')
-      this.$store.commit("setMyKey", data);
-    })
+
     // if(this.$store.state.otherPlayers.length >= 2) {
     // }
     // this.getSong()

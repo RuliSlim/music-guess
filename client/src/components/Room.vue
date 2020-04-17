@@ -34,7 +34,17 @@ export default {
       // console.log(payload)
       this.socket.emit('join-room', payload)  
       this.$store.commit('setRoom', this.room.name)
-      this.$router.push('/play')
+      this.socket.on("joined-room", (data) => {
+        this.$store.commit("setPlayerList", data)
+      })
+      this.socket.on('selfJoin', (data) => {
+      // console.log(data, 'dayada csanjdja')
+        this.$store.commit("setMyKey", data);
+        this.$router.push('/play')
+      })
+      this.socket.on('failJoin', (data) => {
+        this.$router.push('/')
+      })
     },
   }
 }
@@ -46,6 +56,5 @@ export default {
   flex-direction: column;
   justify-content: start;
   background-color: white;
-
 }
 </style>
