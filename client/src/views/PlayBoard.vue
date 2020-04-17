@@ -52,10 +52,19 @@
         </b-row>
       </b-col>
     </b-row>
+    <b-button v-b-modal.modal-1>Launch demo modal</b-button>
+
+    <b-modal id="winnerModal" :title="title">
+      <p class="my-4">{{winner}} guessed correctly</p>
+    </b-modal>
   </div>
 </template>
 
+
+
+
 <script>
+let audio;
 // @ is an alias to /src
 //import db from "@/fb";
 import io from "socket.io-client";
@@ -75,26 +84,39 @@ export default {
       roomName: "",
       roomList: [],
       answer: null,
-      answerList: []
+      answerList: [],
+      audioUrl: null,
+      title: null,
+      winner: null
     };
   },
   computed: {
-    ...mapState(["socket", "myName", "myKey", "playerCount"])
+    ...mapState(["socket", "myName", "myKey", "playerCount"]),
+    checkGuess() {
+      return this.answer.toLowerCase();
+    },
+    checkTitle() {
+      return this.title.toLowerCase();
+    }
   },
-  // watch: {
-  //   otherPlayers() {
-  //     if(this.$store.state.listOtherPlayers.length >= 2) {
-  //       console.log('masuk sini sih')
-  //       this.getSong()
-  //     }
-  //   }
-  // },
   mounted() {
-
-    this.socket.on("joined-room", data => {
-      console.log(data, "ini data");
-      this.$store.commit("setPlayerCount", data);
-    });
+    this.socket.on("win", data => {
+      this.winner = data.name;
+      console.log(data, "this.winner");
+      if (this.winner) {
+        this.$bvModal.show("winnerModal");
+        //audio = new Audio(this.audioUrl);
+        // audio.stop();
+        audio.pause();
+        // sound.currentTime = 0;
+        // this.audio.stop();
+        this.winner = null;
+      }
+    }),
+      this.socket.on("joined-room", data => {
+        console.log(data, "ini data");
+        this.$store.commit("setPlayerCount", data);
+      });
     this.socket.on("selfJoin", data => {
       console.log(data, "dayada csanjdja");
       this.$store.commit("setMyKey", data);
@@ -104,25 +126,33 @@ export default {
       this.answerList.push({ guess: data, user: 0 });
     });
 
-          this.socket.emit("getSong", this.$store.state.joinedRoom);
-      console.log('masuk cuy')
-    this.socket.on('getSong', (data) => {
-      console.log(data, 'Lagu cuy')
-      let audio = new Audio(data.preview);
-      if(!audio.paused) audio.play();
-    })
+    this.socket.emit("getSong", this.$store.state.joinedRoom);
+    console.log("masuk cuy");
+    this.socket.on("getSong", data => {
+      console.log(data, "Lagu cuy");
+      this.audioUrl = data.preview;
+      audio = new Audio(data.preview);
+      this.title = data.title;
+      audio.play();
+    });
   },
-  created() {
-
-  },
+  created() {},
   methods: {
     ...mapMutations(["setSocket"]),
 
     guess(evt) {
       evt.preventDefault();
-      if (this.answer == "is lit") {
-        //next song
+      console.log(this.checkGuess, this.checkTitle);
+
+      if (this.checkGuess == this.checkTitle) {
+        console.log("masuk correc");
+        this.socket.emit("correct", {
+          name: this.myName,
+          title: this.title,
+          room: this.$store.state.joinedRoom
+        });
       }
+
       this.answerList.push({
         user: 1,
         guess: this.answer
@@ -134,17 +164,19 @@ export default {
       });
 
       this.answer = null;
-      //   this.scrollToEnd();
     },
     scrollToEnd: function() {
       var container = this.$el.querySelector("#answercontainer");
       container.scrollTop = container.scrollHeight;
+    },
+    getSong() {
+      this.socket.emit("getSong", this.$store.state.joinedRoom);
+      console.log("masuk cuy");
     }
   },
   watch: {
     answerList() {
       this.scrollToEnd();
-
     }
   }
 };

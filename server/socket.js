@@ -39,11 +39,12 @@ io.on("connection", function (socket) {
       } else {
         io.to(roomName).clients((err, client) => {
 
-          if(client.length == 2) {
+          if (client.length == 2) { //room capacity
             socket.emit('failJoin', 'Room fuul')
           } else {
+            console.log(client, 'socketjs')
             socket.join(roomName);
-            socket.emit('selfJoin', client[client.length-1]);
+            socket.emit('selfJoin', client[client.length - 1]);
             io.to(roomName).emit('joined-room', client);
           }
         })
@@ -57,7 +58,9 @@ io.on("connection", function (socket) {
   })
 
 
-
+  socket.on('correct', (winner) => {
+    io.to(winner.room).emit('win', { name: winner.name, title: winner.title })
+  })
 
 
 
@@ -65,11 +68,11 @@ io.on("connection", function (socket) {
   socket.on('getSong', (roomName) => {
     // if(io.to)
     io.to(roomName).clients((err, client) => {
-        if(client.length > 1) {
-          SongController.getOne((err, song) => {
-            io.to(roomName).emit('getSong', song)
-          })
-        }
+      if (client.length > 1) { //room capacity -1
+        SongController.getOne((err, song) => {
+          io.to(roomName).emit('getSong', song)
+        })
+      }
     })
   })
 })
